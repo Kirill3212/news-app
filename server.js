@@ -1,3 +1,8 @@
+/**
+ * @file server.js
+ * Главная точка входа в приложение. Инициализация Express, Socket.IO, подключение к MongoDB и запуск cron-задач.
+ */
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -14,33 +19,53 @@ import { initSocket } from "./services/socket.js";
 import { corsOptions } from "./config/corsOptions.js";
 import { startNewsPublisherJob } from "./jobs/newsPublisher.js";
 
+/**
+ * Экземпляр Express-приложения
+ * @type {import('express').Express}
+ */
 const app = express();
+
+/**
+ * HTTP сервер для Express и Socket.IO
+ * @type {import('http').Server}
+ */
 const server = http.createServer(app);
 
-// Инициализация Socket.IO
+// Инициализация Socket.IO для real-time уведомлений
 initSocket(server);
 
+/**
+ * Настройка middleware для CORS и обработки JSON
+ */
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Роуты
+/**
+ * Регистрация API маршрутов
+ */
 app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoutes);
 
-// Подключение к MongoDB
+/**
+ * Подключение к MongoDB и регистрация GridFS роутов после подключения
+ */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
 
-    // Регистрация GridFS раута, как DB будет готова
+    // Регистрация GridFS раута, когда база данных готова
     app.use("/api/files", filesRoutes(mongoose.connection.getClient().db()));
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Запуск news publiser
+/**
+ * Запуск cron-задачи для отложенной публикации новостей
+ */
 startNewsPublisherJob();
 
-// Запуск сервера
+/**
+ * Запуск сервера на указанном порту
+ */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

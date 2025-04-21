@@ -1,3 +1,8 @@
+/**
+ * @file routes/news.js
+ * Роуты для CRUD-операций с новостями и real-time уведомлений через Socket.IO.
+ */
+
 import express from "express";
 import mongoose from "mongoose";
 import News from "../models/News.js";
@@ -6,7 +11,11 @@ import { getIO } from "../services/socket.js";
 
 const router = express.Router();
 
-// Создать новость
+/**
+ * @route POST /api/news
+ * @desc Создать новость
+ * @access Защищённый
+ */
 router.post("/", authMiddleware, async (req, res) => {
   const { title, content, publishAt } = req.body;
 
@@ -28,7 +37,11 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-// Редактировать новость
+/**
+ * @route PUT /api/news/:id
+ * @desc Редактировать новость
+ * @access Защищённый
+ */
 router.put("/:id", authMiddleware, async (req, res) => {
   const { title, content, publishAt, published } = req.body;
 
@@ -62,7 +75,11 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// Удалить новость
+/**
+ * @route DELETE /api/news/:id
+ * @desc Удалить новость
+ * @access Защищённый
+ */
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
@@ -82,7 +99,11 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// Публикация новости (endpoint для немедленной публикации)
+/**
+ * @route POST /api/news/:id/publish
+ * @desc Публикация новости (endpoint для немедленной публикации)
+ * @access Защищённый
+ */
 router.post("/:id/publish", authMiddleware, async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
@@ -101,7 +122,11 @@ router.post("/:id/publish", authMiddleware, async (req, res) => {
   }
 });
 
-// Получить все новости пользователя
+/**
+ * @route GET /api/news
+ * @desc Получить все новости пользователя
+ * @access Защищённый
+ */
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const news = await News.find({ author: req.user._id });

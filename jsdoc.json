@@ -1,0 +1,11 @@
+{
+  "source": {
+    "include": ["routes", "models", "services", "jobs", "config", "middleware"], 
+    "includePattern": ".js$"
+  },
+  "opts": {
+    "destination": "./docs",
+    "recurse": true,
+    "readme": "./README.md"
+  }
+}

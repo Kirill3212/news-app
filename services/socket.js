@@ -1,7 +1,22 @@
+/**
+ * @file services/socket.js
+ * Модуль инициализации и экспорта Socket.IO для real-time уведомлений.
+ */
+
+/**
+ * @typedef {Object} SocketIOServer
+ * @see https://socket.io/docs/v4/server-api/
+ */
+
 import { Server as SocketIOServer } from "socket.io";
 
 let io = null;
 
+/**
+ * Инициализация Socket.IO
+ * @param {Object} server - HTTP сервер, созданный через http.createServer(app)
+ * @returns {SocketIOServer} Экземпляр Socket.IO сервера
+ */
 export function initSocket(server) {
   io = new SocketIOServer(server, {
     cors: {
@@ -20,7 +35,11 @@ export function initSocket(server) {
   return io;
 }
 
-//  Получить текущий экземпляр io
+/**
+ * Получить текущий экземпляр io
+ * @returns {SocketIOServer} Экземпляр Socket.IO сервера
+ * @throws {Error} Если Socket.IO не инициализирован
+ */
 export function getIO() {
   if (!io) {
     throw new Error("Socket.IO not initialized!");

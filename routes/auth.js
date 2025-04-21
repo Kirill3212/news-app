@@ -1,17 +1,27 @@
+/**
+ * @file routes/auth.js
+ * Роуты для регистрации и аутентификации пользователей.
+ */
+
 import express from "express";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-// Регистрация
+/**
+ * @route POST /api/auth/register
+ * @desc Регистрация нового пользователя
+ * @access Public
+ */
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    // Проверка на существование пользователя
     let user = await User.findOne({ username });
     if (user)
-      return res.status(400).json({ message: "Username already exists" });
+      return res.status(409).json({ message: "User already exists" });
 
     user = new User({ username, password });
     await user.save();
@@ -22,21 +32,26 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Авторизация
+/**
+ * @route POST /api/auth/login
+ * @desc Аутентификация пользователя и выдача JWT
+ * @access Public
+ */
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
 
-    const payload = { id: user._id };
+    // Генерация JWT
+    const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "7d",
     });
 
     res.json({ token });

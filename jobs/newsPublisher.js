@@ -1,8 +1,19 @@
+/**
+ * @file jobs/newsPublisher.js
+ * Cron-задача для отложенной публикации новостей.
+ */
+
 import cron from "node-cron";
 import News from "../models/News.js";
 
-// Отложенная публикация новости
+/**
+ * Запускает cron-задачу для публикации новостей с истёкшим временем publishAt.
+ * Проверяет каждую минуту.
+ */
 export function startNewsPublisherJob() {
+  /**
+   * Планирует задачу на выполнение каждую минуту
+   */
   cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
@@ -11,6 +22,9 @@ export function startNewsPublisherJob() {
         publishAt: { $lte: now, $ne: null },
       });
 
+      /**
+       * Обрабатываем каждую новость, которая должна быть опубликована
+       */
       for (const news of newsToPublish) {
         news.published = true;
         news.publishAt = null;

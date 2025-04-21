@@ -1,3 +1,8 @@
+/**
+ * @file routes/files.js
+ * Роуты для загрузки и скачивания файлов через MongoDB GridFS.
+ */
+
 import { Router } from "express";
 import multer from "multer";
 import { GridFSBucket } from "mongodb";
@@ -6,11 +11,20 @@ import { Readable } from "stream";
 
 const upload = multer();
 
+/**
+ * Создаёт роутер для работы с файлами через GridFS.
+ * @param {Db} db - Экземпляр MongoDB базы данных
+ * @returns {Router} Экспресс-роутер
+ */
 export default function files(db) {
   const router = Router();
   const bucket = new GridFSBucket(db, { bucketName: "uploads" });
 
-  // Upload file на GridFS
+  /**
+   * @route POST /api/files/upload
+   * @desc Загрузка файла в GridFS
+   * @access Public (или защитите по необходимости)
+   */
   router.post("/upload", upload.single("file"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -42,7 +56,11 @@ export default function files(db) {
       });
   });
 
-  // Download file из GridFS
+  /**
+   * @route GET /api/files/:id
+   * @desc Скачать файл из GridFS по ID
+   * @access Public (или защитите по необходимости)
+   */
   router.get("/:id", async (req, res) => {
     try {
       const fileId = new mongoose.Types.ObjectId(req.params.id);
