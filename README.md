@@ -50,3 +50,5 @@ The main endpoints to shoot:
 - Delete News https://news-app-production-73ae.up.railway.app/api/news/id
 - Get All News https://news-app-production-73ae.up.railway.app/api/news
 - Immediate Publish New https://news-app-production-73ae.up.railway.app/api/news/id/publish
+- Upload File https://news-app-production-73ae.up.railway.app/api/files/upload
+- Download File https://news-app-production-73ae.up.railway.app/api/files/id
